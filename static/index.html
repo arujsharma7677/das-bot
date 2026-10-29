@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Property Assistant · Dar Global &amp; Wasalt</title>
+<style>
+:root{
+  --bg:#f3efe6;--panel:#ffffff;--ink:#14213d;--muted:#6b7280;--line:#e8e2d6;
+  --accent:#b8893b;--accent-soft:#f6eedf;--user:#14213d;--user-ink:#ffffff;
+  --bot:#f8f6f1;--danger:#b42318;--ok:#12b76a;--shadow:0 20px 60px rgba(20,33,61,.12);
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0b1020;--panel:#121a2e;--ink:#e7eaf2;--muted:#97a0b4;--line:#232e48;
+  --accent:#d6a85c;--accent-soft:#2a2a2c;--user:#d6a85c;--user-ink:#121a2e;
+  --bot:#1a2340;--danger:#f97066;--shadow:0 20px 60px rgba(0,0,0,.45);
+}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:radial-gradient(1200px 600px at 10% -10%,rgba(184,137,59,.18),transparent 60%),var(--bg);
+  color:var(--ink);display:flex;justify-content:center}
+.app{width:100%;max-width:860px;height:100dvh;display:flex;flex-direction:column;background:var(--panel)}
+@media (min-width:900px){.app{height:calc(100dvh - 48px);margin:24px 0;border:1px solid var(--line);
+  border-radius:22px;box-shadow:var(--shadow);overflow:hidden}}
+header{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.logo{flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+  background:linear-gradient(135deg,#14213d,#b8893b);color:#fff}
+.title{flex:1;min-width:0}
+.title h1{margin:0;font-size:16px;font-weight:650;letter-spacing:.2px}
+.status{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.dot.ok{background:var(--ok);box-shadow:0 0 0 3px rgba(18,183,106,.15)}
+.ghost{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;
+  padding:8px 12px;font:inherit;font-size:13px;cursor:pointer}
+.ghost:hover{border-color:var(--accent);color:var(--accent)}
+#log{flex:1;overflow-y:auto;padding:22px 18px;scroll-behavior:smooth}
+.welcome{max-width:580px;margin:5vh auto 0;text-align:center}
+.welcome h2{font-size:24px;margin:14px 0 6px;font-weight:700}
+.welcome p{color:var(--muted);margin:0 0 22px}
+.badge{display:inline-flex;gap:6px;align-items:center;padding:5px 12px;border-radius:999px;
+  background:var(--accent-soft);color:var(--accent);font-size:12.5px;font-weight:600}
+.chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;text-align:left}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:14px;
+  padding:12px 14px;font:inherit;font-size:14px;cursor:pointer;transition:border-color .15s,transform .15s}
+.chip:hover{border-color:var(--accent);transform:translateY(-1px)}
+.chip small{display:block;color:var(--accent);font-size:11.5px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
+.msg{display:flex;gap:10px;margin:14px 0;animation:in .25s ease-out}
+.msg.user{justify-content:flex-end}
+.avatar{flex:none;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;
+  background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:700}
+.bubble{max-width:min(80%,620px);padding:11px 15px;border-radius:16px;overflow-wrap:anywhere}
+.user .bubble{background:var(--user);color:var(--user-ink);border-bottom-right-radius:5px;white-space:pre-wrap}
+.bot .bubble{background:var(--bot);border:1px solid var(--line);border-bottom-left-radius:5px}
+.bot.error .bubble{border-color:var(--danger);color:var(--danger)}
+.sources{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);display:flex;flex-wrap:wrap;gap:6px}
+.sources span{width:100%;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.src{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:5px 10px;border-radius:999px;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink);text-decoration:none;font-size:12.5px}
+.src:hover{border-color:var(--accent)}
+.src b{color:var(--accent);font-weight:650;white-space:nowrap}
+.src i{font-style:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.typing{display:inline-flex;gap:4px;padding:6px 0}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:blink 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.2s}
+.typing i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+footer{padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.composer{display:flex;align-items:flex-end;gap:8px;border:1px solid var(--line);border-radius:16px;
+  padding:8px 8px 8px 14px;background:var(--panel)}
+.composer:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(184,137,59,.15)}
+textarea{flex:1;border:0;outline:0;resize:none;background:transparent;color:var(--ink);
+  font:inherit;font-size:16px;max-height:140px;padding:8px 0}
+#send{flex:none;width:40px;height:40px;border:0;border-radius:12px;background:var(--accent);
+  color:#fff;display:grid;place-items:center;cursor:pointer}
+#send:disabled{opacity:.45;cursor:not-allowed}
+.meta{display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-size:11.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>
+    </div>
+    <div class="title">
+      <h1>Property Assistant</h1>
+      <div class="status"><span class="dot" id="dot"></span><span id="status">Connecting…</span></div>
+    </div>
+    <button class="ghost" id="clear" type="button">New chat</button>
+  </header>
+
+  <main id="log" aria-live="polite">
+    <section class="welcome" id="welcome">
+      <span class="badge">Dar Global · Wasalt</span>
+      <h2>Ask about projects, properties &amp; services</h2>
+      <p>Answers come only from the public websites of Dar Global and Wasalt, with links to the source pages.</p>
+      <div class="chips">
+        <button class="chip" type="button" data-q="What is Dar Global and where does it operate?">
+          <small>Dar Global</small>What is Dar Global and where does it operate?</button>
+        <button class="chip" type="button" data-q="Which projects does Dar Global have?">
+          <small>Dar Global</small>Which projects does Dar Global have?</button>
+        <button class="chip" type="button" data-q="What services does Wasalt offer?">
+          <small>Wasalt</small>What services does Wasalt offer?</button>
+        <button class="chip" type="button" data-q="How can I contact Wasalt?">
+          <small>Wasalt</small>How can I contact Wasalt?</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <form class="composer" id="composer">
+      <textarea id="q" rows="1" maxlength="1000" placeholder="Ask a question…" aria-label="Your question"></textarea>
+      <button id="send" type="submit" aria-label="Send" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+          stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      </button>
+    </form>
+    <div class="meta">
+      <span>AI answers can be wrong. Verify on the official websites.</span>
+      <span id="count">0/1000</span>
+    </div>
+  </footer>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>

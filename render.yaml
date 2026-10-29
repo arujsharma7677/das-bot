@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: dar-wasalt-chatbot
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'
+    healthCheckPath: /health
+    envVars:
+      - key: OPENROUTER_MODELS
+        value: meta-llama/llama-3.3-70b-instruct:free,openrouter/free
+      - key: RATE_LIMIT_PER_MIN
+        value: "20"
+      - key: PYTHON_VERSION
+        value: "3.12.7"
